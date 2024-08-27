@@ -1,0 +1,144 @@
+{% extends "template.html" %} {% block title %}Queries{% endblock %}
+{% block content %}  
+<h1 align="center">{% block header %}{% endblock %}</h1>
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport"
+         content="width=device-width, 
+                  initial-scale=1.0">
+                  <header class="masthead" style="background-image: url('static/assets/img/prefect2.jpg')">
+                   <div class="container position-relative px-4 px-lg-5">
+                       <div class="row gx-4 gx-lg-5 justify-content-center">
+                           <div class="col-md-10 col-lg-8 col-xl-7">
+                               <div class="site-heading">
+                                   <h1>Queries</h1>
+                                   <span class="subheading">Any queries, concerns or questions, feel free to ask here! </span>
+                               </div>
+                           </div>
+                       </div>
+                   </div>
+</head>
+</header>
+
+<div id ="posts">
+   {% for post in posts%}
+<div class = "card border-dark">
+<div class="card-header d-flex justify-content-between align-items-center">
+   <a href="/posts/{{post.user.username}}">{{post.user.username}}</a>
+
+      <div> <!-- div for a thumbs up -->
+            <span id="likes-count-{{post.id}}">
+            {{ post.likes|length }}</span>
+            {% if user.id in post.likes|map(attribute="author")|list %}
+            <i
+            class="fas fa-thumbs-up"
+            id="like-button-{{post.id}}"
+            onclick="like({{post.id}})"
+            ></i>
+            {% else %}
+            <!--java script is going to use the id (like-button later)-->
+            <i
+            class="far fa-thumbs-up"
+            id="like-button-{{post.id}}" 
+            onclick="like({{post.id}})"
+            ></i>
+            {% endif %}
+         {% if user.id == post.author %}
+         <div class="btn-group">
+            <button
+            type="button"
+            class="btn btn-sm btn-primary dropdown-toggle"
+            data-bs-toggle="dropdown">
+         </button>
+         <ul class="dropdown-menu">
+            <li>
+               <a href="/delete-post/ {{post.id}}" class="dropdown-item">Delete</a>
+            </li>
+         </ul>
+         </div>
+         {% endif %}
+       </div> <!-- This is the end of the new div for the thumbs up -->
+       
+      </div>
+   <div class="card-body">
+      <div class="card-text">{{post.text}}</div>
+      <br />
+      <!-- COMMENTS FIELD -->
+      <div classs="collapse" id="comment-{{post.id}}">
+         <div class = "card-body" id="comments-expanded-{{post.id}}">
+            {% for comment in post.comments %}
+            <div class="d-flex justify-content-between align-items-center">
+               <div>
+                  <a href="/posts/{{comment.user.username}}">
+                     {{comment.user.username}}
+                  </a>: {{comment.text}}
+               </div>
+               <div>
+                  <small class="text-muted">{{comment.date_created}}</small>
+                  {% if user.id == comment.author or user.id == post.author %}
+                  <div class="btn-group">
+                     <button
+                     type="button"
+                     class="btn btn-sm btn-primary dropdown-toggle"
+                     data-bs-toggle="dropdown"
+                     ></button>
+                     <ul class="dropdown-menu">
+                        <li>
+                           <a
+                           href="/delete-comment/{{comment.id}}"
+                           class="dropdown-item"
+                           >Delete</a>
+                        </li>
+                     </ul>
+                  </div>
+                  {% endif %}
+               </div>
+            </div>
+            {% endfor %}
+         </div>
+      </div>
+      <p class="card-text">
+         {% if post.comments|length > 0%}
+         <a data-bs-toggle="collapse" href="#comments-{{post.id}}" role="button">
+            <small>View {{post.comments|length}} Comments</small>
+         </a>
+         {% else %}
+         <small class="text-muted">No comments</small>
+         {% endif %}
+      </p>
+      <form
+      class="input-group mb-3"
+      method="POST"
+      action="/create-comment/{{post.id}}"
+      >
+      <input
+      type="text"
+      id="text"
+      name="text"
+      class="form-control"
+      placeholder="Comment Something!"
+      />
+      <button type="submit" class="btn btn-primary">Comment</button>
+      </form>
+      <!-- END OF THE COMMENTS FIELD -->
+   </div>
+   <div class="card-footer text-muted">{{post.date_created}}</div>
+   </div>
+   <br />
+   {% endfor %}
+</div>
+<br/>
+<div align="center">
+   <a href="/create-post">
+      <button type='button' class='btn btn-primary btn-lg'>
+       Create a post
+     </button>
+</a>
+</div>
+
+<!-- BOOTSTRAP -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" 
+integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" 
+crossorigin="anonymous"></script>
+
+{% endblock %}
